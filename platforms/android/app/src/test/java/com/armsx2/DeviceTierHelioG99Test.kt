@@ -17,6 +17,14 @@ class DeviceTierHelioG99Test {
         assertTrue(DeviceTier.isHelioG99Model("HELIO G99"))
     }
 
+
+    @Test
+    fun fallsBackToHardwareWhenSocModelIsUnknown() {
+        assertTrue(DeviceTier.isHelioG99Model(DeviceTier.firstKnownSocModel("unknown", "mt6789")))
+        assertTrue(DeviceTier.isHelioG99Model(DeviceTier.firstKnownSocModel("", "Helio G99")))
+        assertFalse(DeviceTier.isHelioG99Model(DeviceTier.firstKnownSocModel("unknown", "MT6877")))
+    }
+
     @Test
     fun doesNotGuessOtherSocModelsAreHelioG99() {
         for (model in listOf("", "unknown", "MT6877", "Helio G96", "Snapdragon 680", "Mali-G57 MC2")) {
