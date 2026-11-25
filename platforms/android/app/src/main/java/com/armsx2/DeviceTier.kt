@@ -104,11 +104,16 @@ object DeviceTier {
     /** Human-readable SoC/hardware id for logging/diagnostics. Uses
      *  Build.SOC_MODEL on API 31+, else Build.HARDWARE. */
     fun socModel(): String = try {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
-            Build.SOC_MODEL ?: Build.HARDWARE ?: "unknown"
-        else
-            Build.HARDWARE ?: "unknown"
+        val soc = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) Build.SOC_MODEL else null
+        firstKnownSocModel(soc, Build.HARDWARE)
     } catch (_: Throwable) {
         "unknown"
+    }
+
+    /** Prefer the SoC model, but fall back when Android reports it as blank or "unknown". */
+    internal fun firstKnownSocModel(socModel: String?, hardware: String?): String {
+        return listOf(socModel, hardware)
+            .firstOrNull { !it.isNullOrBlank() && !it.equals("unknown", ignoreCase = true) }
+            ?: "unknown"
     }
 }
