@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0+
 
 #include "GS/Renderers/Common/GSGPUProfilePrivate.h"
+#include "GS/Renderers/Common/GSGPUProfileHelioG99.h"
 
 #include <algorithm>
 #include <array>
@@ -256,6 +257,18 @@ ResolvedGpuProfile ResolveMaliProfile(std::string_view lowered_hints)
 	resolved.gpu.architecture = spec ? spec->architecture : ArchitectureForUnknownMali(series, model);
 	resolved.gpu.model_number = model;
 	resolved.gpu.core_count = ParseCoreCount(lowered_hints);
+
+	// Some Android drivers expose only "Mali-G57" and omit the MC count.
+	// When the SoC identity confirms Helio G99 (MT6789), fill in its known
+	// two-core Mali-G57 configuration so the existing low-core tuning applies.
+	const bool is_helio_g99 =
+		(lowered_hints.find(HelioG99Profile::kSocId) != std::string_view::npos) ||
+		(lowered_hints.find(HelioG99Profile::kSocName) != std::string_view::npos);
+	if (is_helio_g99 && series == HelioG99Profile::kGpuSeries &&
+		model == HelioG99Profile::kGpuModel && resolved.gpu.core_count == 0)
+	{
+		resolved.gpu.core_count = HelioG99Profile::kGpuCoreCount;
+	}
 	resolved.gpu.recognized = (spec != nullptr);
 
 	if (immortalis)
