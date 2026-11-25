@@ -59,6 +59,9 @@ add_pcsx2_test(core_test
 	StubHost.cpp
 )
 
+# Native mobile GPU profile detection tests.
+target_sources(core_test PRIVATE gpu_profile_helio_g99_tests.cpp)
+
 # The game database tests parse the real GameIndex.yaml and the mobile overlay from the source tree.
 set_source_files_properties(iop_thread_gamedb_tests.cpp PROPERTIES COMPILE_DEFINITIONS
 	"ARMSX2_GAMEINDEX_YAML=\"${CMAKE_SOURCE_DIR}/bin/resources/GameIndex.yaml\";ARMSX2_GAMEDB_OVERLAY_YAML=\"${CMAKE_SOURCE_DIR}/bin/resources-overlay/armsx2_overrides.yaml\"")
