@@ -89,6 +89,13 @@ object DeviceTier {
         false
     }
 
+    /** True only when Android identifies the MediaTek Helio G99 (MT6789).
+     *  Used to expose its opt-in emulator preset; it never forces settings. */
+    fun isHelioG99(): Boolean {
+        val model = socModel().lowercase()
+        return model.contains("mt6789") || model.contains("helio g99")
+    }
+
     /** Human-readable SoC/hardware id for logging/diagnostics. Uses
      *  Build.SOC_MODEL on API 31+, else Build.HARDWARE. */
     fun socModel(): String = try {
