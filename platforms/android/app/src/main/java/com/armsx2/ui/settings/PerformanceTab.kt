@@ -145,7 +145,7 @@ fun PerformanceTab(state: MutableState<Settings>) {
             // change Android CPU governors. Keep the risky experimental VU JIT
             // switches at their normal safe defaults.
             val hasHelioG99 = com.armsx2.DeviceTier.isHelioG99()
-            val helioG99 = Settings.lowEndPreset(
+            val helioBase = Settings.lowEndPreset(
                 s.copy(
                     cpu = s.cpu.copy(
                         eeCycleRate = 0,
@@ -162,6 +162,12 @@ fun PerformanceTab(state: MutableState<Settings>) {
                     ),
                 ),
                 mtvu = true,
+            )
+            // Speed-first G99 profile: keep the low-end GPU settings and use the
+            // existing EE cycle-skip level from the Fast preset. This can improve
+            // throughput in CPU-bound games, at the cost of emulation accuracy.
+            val helioG99 = helioBase.copy(
+                cpu = helioBase.cpu.copy(eeCycleSkip = 2),
             )
             // -1 = no preset matches (custom): no segment highlighted.
             val idx = when (s) {
