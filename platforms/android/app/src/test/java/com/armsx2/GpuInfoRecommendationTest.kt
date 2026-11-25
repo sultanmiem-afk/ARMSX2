@@ -66,6 +66,22 @@ class GpuInfoRecommendationTest {
     }
 
     @Test
+    fun maliG57IsRecognizedWithOrWithoutTheReportedCoreCount() {
+        for (renderer in listOf("Mali-G57", "Mali-G57 MC2", "ARM Mali-G57")) {
+            assertEquals(renderer, "ARMSX2 · MaliSX2", GpuInfo.recommendation(renderer)?.sourceLabel)
+            assertTrue(renderer, CustomDriver.isMaliSX2Supported(renderer))
+        }
+    }
+
+    @Test
+    fun unsupportedMaliModelsDoNotGetTheMaliSX2Recommendation() {
+        for (renderer in listOf("Mali-G720 MC7", "Mali-T880 MP12", "Mali-G3100")) {
+            assertFalse(renderer, CustomDriver.isMaliSX2Supported(renderer))
+            assertNull(renderer, GpuInfo.recommendation(renderer))
+        }
+    }
+
+    @Test
     fun otherGpusGetNoRecommendation() {
         for (r in listOf(
             null, "", "Mali", "Mali-G71 MP20", "Mali-G72 MP12", "Mali-G720 MC7", "Mali-T880 MP12",
