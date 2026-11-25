@@ -204,7 +204,13 @@ const char* GSUtil::GetPerfMonCounterName(GSPerfMon::counter_t counter, bool hw)
 			"TCSourceHit",
 			"TCSourceMiss",
 			"HashCacheHit",
-			"HashCacheMiss"
+			"HashCacheMiss",
+			"PipelineSwitches",
+			"GpuBlockingWaits",
+			"RenderPassAreaPixels",
+			"NativeTexelGridDraws",
+			"SpriteEdgeClampDraws",
+			"SwPaletteBlockCopies"
 		};
 		return counter < std::size(names_hw) ? names_hw[counter] : "";
 	}
