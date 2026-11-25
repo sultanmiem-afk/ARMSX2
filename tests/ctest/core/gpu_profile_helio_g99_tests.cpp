@@ -28,6 +28,21 @@ TEST(GpuProfileHelioG99Tests, InfersDualCoreMaliG57FromMt6789)
 	EXPECT_TRUE(selection.gs_tuning.constrained);
 }
 
+TEST(GpuProfileHelioG99Tests, InfersDualCoreMaliG57FromMarketingName)
+{
+	MobileDriverContext context;
+	context.platform_hints = "ro.soc.model=HELIO G99";
+
+	const GpuProfileSelection selection =
+		GpuProfileDetector::Resolve("auto", "ARM", "Mali-G57", context);
+
+	EXPECT_EQ(selection.gpu.core_count, 2);
+	EXPECT_EQ(selection.gpu.name, "Mali-G57 MC2");
+	EXPECT_EQ(selection.gs_tuning.pooled_targets, 64);
+	EXPECT_EQ(selection.gs_tuning.pooled_textures, 64);
+	EXPECT_TRUE(selection.gs_tuning.constrained);
+}
+
 TEST(GpuProfileHelioG99Tests, DoesNotInferCoresForAnotherSoc)
 {
 	MobileDriverContext context;
