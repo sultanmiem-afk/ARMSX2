@@ -140,13 +140,52 @@ fun PerformanceTab(state: MutableState<Settings>) {
                 ),
                 mtvu = com.armsx2.DeviceTier.mtvuDefault(),
             )
+            // Helio G99: opt-in preset shown only on MT6789 devices. It uses
+            // existing, reversible emulator settings; it does not overclock or
+            // change Android CPU governors. Keep the risky experimental VU JIT
+            // switches at their normal safe defaults.
+            val hasHelioG99 = com.armsx2.DeviceTier.isHelioG99()
+            val helioG99 = Settings.lowEndPreset(
+                s.copy(
+                    cpu = s.cpu.copy(
+                        eeCycleRate = 0,
+                        vu1Instant = true,
+                        vuFlagHack = true,
+                        intcStat = true,
+                        waitLoop = true,
+                        fastCDVD = true,
+                        mtvu = true,
+                        iopThread = com.armsx2.DeviceTier.iopThreadDefault(mtvu = true),
+                        vuNeonFusions = true,
+                        vuDeferredWrites = false,
+                        vuSkipStallSim = false,
+                    ),
+                ),
+                mtvu = true,
+            )
             // -1 = no preset matches (custom): no segment highlighted.
-            val idx = when (s) { safe -> 0; fast -> 1; lowEnd -> 2; else -> -1 }
+            val idx = when (s) {
+                safe -> 0
+                fast -> 1
+                lowEnd -> 2
+                helioG99 -> if (hasHelioG99) 3 else -1
+                else -> -1
+            }
             SegmentedRow(
                 label = str("perf.speedhackProfile.label"),
-                options = listOf(str("perf.speedhackProfile.optimal"), str("perf.speedhackProfile.fast"), str("perf.speedhackProfile.lowEnd")),
+                options = if (hasHelioG99)
+                    listOf(str("perf.speedhackProfile.optimal"), str("perf.speedhackProfile.fast"), str("perf.speedhackProfile.lowEnd"), "Helio G99")
+                else
+                    listOf(str("perf.speedhackProfile.optimal"), str("perf.speedhackProfile.fast"), str("perf.speedhackProfile.lowEnd")),
                 selectedIndex = idx,
-                onChange = { when (it) { 0 -> apply(safe); 1 -> apply(fast); 2 -> apply(lowEnd) } },
+                onChange = {
+                    when (it) {
+                        0 -> apply(safe)
+                        1 -> apply(fast)
+                        2 -> apply(lowEnd)
+                        3 -> if (hasHelioG99) apply(helioG99)
+                    }
+                },
             )
         }
         HelpText(str("perf.speedhackProfile.help"))
